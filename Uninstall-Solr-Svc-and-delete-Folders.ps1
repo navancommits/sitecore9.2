@@ -3,8 +3,7 @@ Param(
 	$nssmVersion = "2.24",
     $installSubFolder = "instance-8",
     $installFolder = "C:\solr\$installSubFolder",
-    $solrSvcName="solr-$installSubFolder-$solrVersion" #change here to make the service name unique
-)
+    $solrSvcName="solr-$installSubFolder-$solrVersion" #change here if your service name is different
 
 $svc = Get-Service "$solrSvcName" -ErrorAction SilentlyContinue
 if($svc)
