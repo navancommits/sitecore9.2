@@ -1,9 +1,10 @@
 Param(
     $solrVersion = "7.5.0",
-	$installSubFolder = "instance-5",
+	$installSubFolder = "instance-7",
     $installFolder = "C:\solr\$installSubFolder",
-    $solrPort = "8987",
-    $solrHost = "solr",
+    $solrPort = "8997",
+    $solrHost = "solr-$installSubFolder",
+	$solrCertName = $solrHost,
     $solrSSL = $true,
     $nssmVersion = "2.24",
     $JREVersion = "1.8.0_221",
@@ -95,14 +96,14 @@ if($solrHost -ne "localhost")
 if($solrSSL -eq $true)
 {
     # Generate SSL cert
-    $existingCert = Get-ChildItem Cert:\LocalMachine\Root | where FriendlyName -eq "$solrName"
+    $existingCert = Get-ChildItem Cert:\LocalMachine\Root | where FriendlyName -eq "$solrCertName"
     if(!($existingCert))
     {
         Write-Host "Creating & trusting an new SSL Cert for $solrHost"
 
         # Generate a cert
         # https://docs.microsoft.com/en-us/powershell/module/pkiclient/new-selfsignedcertificate?view=win10-ps
-        $cert = New-SelfSignedCertificate -FriendlyName "$solrName" -DnsName "$solrHost" -CertStoreLocation "cert:\LocalMachine" -NotAfter (Get-Date).AddYears(10)
+        $cert = New-SelfSignedCertificate -FriendlyName "$solrCertName" -DnsName "$solrHost" -CertStoreLocation "cert:\LocalMachine" -NotAfter (Get-Date).AddYears(10)
 
         # Trust the cert
         # https://stackoverflow.com/questions/8815145/how-to-trust-a-certificate-in-windows-powershell
@@ -120,7 +121,7 @@ if($solrSSL -eq $true)
     {
         Write-Host "Exporting cert for Solr to use"
 
-        $cert = Get-ChildItem Cert:\LocalMachine\Root | where FriendlyName -eq "$solrName"
+        $cert = Get-ChildItem Cert:\LocalMachine\Root | where FriendlyName -eq "$solrCertName"
     
         $certStore = "$solrRoot\server\etc\solr-ssl.keystore.pfx"
         $certPwd = ConvertTo-SecureString -String "secret" -Force -AsPlainText
